@@ -1,0 +1,18 @@
+[package]
+name = "d3d9-imgui-hook"
+version = "0.1.0"
+authors = [""]
+edition = "2018"
+
+
+[lib]
+crate_type = ["cdylib"]
+
+[dependencies]
+d3d9_device_grabber = { git = "https://github.com/super-continent/d3d9-device-grabber" }
+imgui-impl-win32-rs = { git = "https://github.com/super-continent/imgui-impl-win32-rs" }
+imgui-dx9-renderer = "0.5"
+winapi = { version = "0.3", features = ["minwindef", "consoleapi", "libloaderapi", "d3d9", "d3d9types"] }
+imgui = "0.5.0"
+detour = "0.7.1"
+lazy_static = "1.4.0"
