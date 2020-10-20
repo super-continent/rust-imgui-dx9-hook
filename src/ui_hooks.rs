@@ -29,7 +29,7 @@ pub unsafe fn init_ui() -> Result<(), Box<dyn Error>> {
         Ok((dev, window)) => (dev, window),
         Err(e) => return Err(e),
     };
-    info!("Got device VTable");
+    debug!("Got device VTable");
     let endscene = (*device.lpVtbl).EndScene;
     let reset = (*device.lpVtbl).Reset;
 
@@ -39,7 +39,7 @@ pub unsafe fn init_ui() -> Result<(), Box<dyn Error>> {
     im_ctx.set_ini_filename(Some(std::path::PathBuf::from("imgui.ini")));
 
     let wind_impl = Win32Impl::init(&mut im_ctx, window_handle)?;
-    info!("Set up imgui context and window impl");
+    debug!("Set up imgui context and window impl");
 
     let program_state = ImState {
         renderer: None,

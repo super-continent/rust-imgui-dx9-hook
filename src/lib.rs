@@ -12,7 +12,7 @@ use winapi::{
     ctypes::c_void, shared::minwindef::*, um::libloaderapi, um::winnt::DLL_PROCESS_ATTACH,
 };
 
-const LOG_LEVEL: LevelFilter = LevelFilter::Trace;
+const LOG_LEVEL: LevelFilter = LevelFilter::Debug;
 
 #[no_mangle]
 #[allow(non_snake_case)]
