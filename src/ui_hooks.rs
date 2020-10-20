@@ -41,14 +41,14 @@ pub unsafe fn init_ui() -> Result<(), Box<dyn Error>> {
     let wind_impl = Win32Impl::init(&mut im_ctx, window_handle)?;
     info!("Set up imgui context and window impl");
 
-    
     let program_state = ImState {
         renderer: None,
         window: wind_impl,
         im_ctx,
     };
-    
-    { // init needed global ui state
+
+    {
+        // init needed global ui state
         *UI_STATE.lock() = Some(program_state);
         *ORIG_WNDPROC.lock() = get_wndproc(window_handle);
     }
@@ -119,7 +119,7 @@ fn reset_hook(device: *mut IDirect3DDevice9, present_params: *mut D3DPRESENT_PAR
                 return ResetHook.call(device, present_params);
             }
         };
-        
+
         state.renderer = None;
 
         ResetHook.call(device, present_params)
