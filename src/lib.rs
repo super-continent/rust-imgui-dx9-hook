@@ -9,43 +9,41 @@ extern crate lazy_static;
 extern crate log;
 use simplelog::*;
 use winapi::{
-    shared::minwindef::*,
-    um::winnt::{ DLL_PROCESS_ATTACH },
-    ctypes::{ c_void },
-    um::libloaderapi,
+    ctypes::c_void, shared::minwindef::*, um::libloaderapi, um::winnt::DLL_PROCESS_ATTACH,
 };
 
 const LOG_LEVEL: LevelFilter = LevelFilter::Trace;
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "stdcall" fn DllMain(
-    hinst_dll: HINSTANCE,
-    attach_reason: DWORD,
-    _: c_void
-) -> BOOL
-{
+pub extern "stdcall" fn DllMain(hinst_dll: HINSTANCE, attach_reason: DWORD, _: c_void) -> BOOL {
     unsafe {
         libloaderapi::DisableThreadLibraryCalls(hinst_dll);
     }
 
     match attach_reason {
-        DLL_PROCESS_ATTACH => { thread::spawn(|| unsafe { initialize() } ); },
-        _ => {},
+        DLL_PROCESS_ATTACH => {
+            thread::spawn(|| unsafe { initialize() });
+        }
+        _ => {}
     };
 
-    return TRUE
+    return TRUE;
 }
 
 unsafe fn initialize() {
-    WriteLogger::init(LOG_LEVEL, Config::default(), std::fs::File::create("rust_imgui_hook.log").unwrap()).unwrap();
+    WriteLogger::init(
+        LOG_LEVEL,
+        Config::default(),
+        std::fs::File::create("rust_imgui_hook.log").unwrap(),
+    )
+    .unwrap();
     info!("Initializing hooks!");
     let mut ui_result = ui_hooks::init_ui();
     while let Err(e) = ui_result {
         ui_result = ui_hooks::init_ui();
         error!("error initializing UI: {}", e);
-    };
-
+    }
 
     info!("hook success");
 }
