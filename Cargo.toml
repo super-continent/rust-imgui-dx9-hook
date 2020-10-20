@@ -16,3 +16,6 @@ winapi = { version = "0.3", features = ["minwindef", "consoleapi", "libloaderapi
 imgui = "0.5.0"
 detour = "0.7.1"
 lazy_static = "1.4.0"
+parking_lot = "0.11.0"
+log = "0.4.11"
+simplelog = "0.8.0"
