@@ -13,4 +13,4 @@ lazy_static! {
 }
 
 /// The folder where all .bbscript files are held
-pub const MODS_FOLDER: &str = "../../Mods";
+pub const MODS_FOLDER: &str = r"..\..\Mods";
