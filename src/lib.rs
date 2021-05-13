@@ -6,12 +6,12 @@ mod helpers;
 mod ui;
 
 use std::ffi::{CString, OsString};
+use std::fs;
 use std::mem;
 use std::os::windows::ffi::OsStringExt;
 use std::ptr;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::thread;
-use std::fs;
 
 #[macro_use]
 extern crate lazy_static;
@@ -58,7 +58,10 @@ unsafe fn initialize() {
 
     info!("Initializing!");
 
-    info!("Mods folder created: {}", fs::create_dir(global::MODS_FOLDER).is_ok());
+    info!(
+        "Mods folder created: {}",
+        fs::create_dir(global::MODS_FOLDER).is_ok()
+    );
 
     let base_addr = libloaderapi::GetModuleHandleA(ptr::null_mut());
 

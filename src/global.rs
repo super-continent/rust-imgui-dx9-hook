@@ -2,7 +2,7 @@ use crate::game::types::GameState;
 
 use parking_lot::Mutex;
 
-use std::{sync::atomic::{AtomicBool, AtomicU32}};
+use std::sync::atomic::{AtomicBool, AtomicU32};
 use std::sync::Arc;
 
 lazy_static! {

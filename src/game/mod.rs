@@ -2,8 +2,8 @@ pub mod hooks;
 mod offset;
 pub mod types;
 
-use std::{fs::File, path::PathBuf};
 use std::io::prelude::*;
+use std::{fs::File, path::PathBuf};
 
 // full list of character shortnames used in scripts
 mod names {
@@ -61,7 +61,7 @@ pub enum ScriptFile {
     Sol,
     Venom,
     Zato,
-    Common
+    Common,
 }
 
 impl ScriptFile {
@@ -92,7 +92,7 @@ impl ScriptFile {
             ScriptFile::Sol => "sol",
             ScriptFile::Venom => "ven",
             ScriptFile::Zato => "zat",
-            ScriptFile::Common => "cmn"
+            ScriptFile::Common => "cmn",
         }
     }
 }
@@ -100,7 +100,7 @@ impl ScriptFile {
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum ScriptType {
     Main,
-    Effect
+    Effect,
 }
 
 fn get_script_file(script_file: ScriptFile, file_type: ScriptType) -> Option<Vec<u8>> {
@@ -115,14 +115,12 @@ fn get_script_file(script_file: ScriptFile, file_type: ScriptType) -> Option<Vec
 
     mods_path.push(file_name);
 
-    let result = File::open(&mods_path).and_then(|mut file| {
-        file.read_to_end(&mut script)
-    });
+    let result = File::open(&mods_path).and_then(|mut file| file.read_to_end(&mut script));
 
     if result.is_ok() {
         debug!("Got script `{}`", mods_path.display());
         Some(script)
-    } else {   
+    } else {
         None
     }
 }

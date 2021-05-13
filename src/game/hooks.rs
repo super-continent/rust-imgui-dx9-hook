@@ -1,8 +1,8 @@
-use super::{get_script_file, ScriptFile, ScriptType, names, offset, types};
+use super::{get_script_file, names, offset, types, ScriptFile, ScriptType};
 use crate::{global, make_fn};
 
-use std::ptr;
 use std::ffi::CStr;
+use std::ptr;
 use std::sync::{
     atomic::{AtomicUsize, Ordering},
     Arc,
@@ -27,7 +27,8 @@ lazy_static! {
         player_2_ef: None
     }));
     static ref SCRIPT_LOAD_CALL_COUNTER: AtomicUsize = AtomicUsize::new(0);
-    static ref SCRIPT_LAST_CHARACTER: Arc<Mutex<ScriptFile>> = Arc::new(Mutex::new(ScriptFile::Sol));
+    static ref SCRIPT_LAST_CHARACTER: Arc<Mutex<ScriptFile>> =
+        Arc::new(Mutex::new(ScriptFile::Sol));
 }
 
 pub unsafe fn init_game_hooks() -> Result<(), detour::Error> {
@@ -48,7 +49,9 @@ pub unsafe fn init_game_hooks() -> Result<(), detour::Error> {
 
     let load_bbscript_fn = make_fn!(base + offset::FN_LOAD_BBSCRIPT => types::FnLoadBBScript);
 
-    LoadBBScriptHook.initialize(load_bbscript_fn, load_script_hook)?.enable()?;
+    LoadBBScriptHook
+        .initialize(load_bbscript_fn, load_script_hook)?
+        .enable()?;
 
     Ok(())
 }
@@ -59,13 +62,19 @@ fn load_script_hook(this: *mut u8, script_ptr: *mut u8, script_size: u32) {
     // TODO: figure out how to detect which character and script
     // is being loaded in a non-hacky way, should be a UE3 script function
 
-    trace!("this: {:#X}, script_ptr: {:#X}, script_size: {:#X}", this as usize, script_ptr as usize, script_size);
-    
+    trace!(
+        "this: {:#X}, script_ptr: {:#X}, script_size: {:#X}",
+        this as usize,
+        script_ptr as usize,
+        script_size
+    );
+
     unsafe {
         let mut last_script = SCRIPT_LAST_CHARACTER.lock();
         let count = SCRIPT_LOAD_CALL_COUNTER.fetch_add(1, Ordering::SeqCst) % 6;
-        
-        let script = if count == 0 || count == 2 { // player 1/2 main file, we find the char names here
+
+        let script = if count == 0 || count == 2 {
+            // player 1/2 main file, we find the char names here
             let state_count = ptr::read_unaligned::<u32>(script_ptr as *const _);
             // calculate offset to a specific bbscript function that seems to always contains the characters name
             let character_str = script_ptr.add((0x8 + ((state_count + 1) * 0x24)) as usize);
@@ -104,11 +113,14 @@ fn load_script_hook(this: *mut u8, script_ptr: *mut u8, script_size: u32) {
             };
 
             get_script_file(*last_script, ScriptType::Main)
-        } else if count == 1 || count == 3 { // player 1/2 effect file
+        } else if count == 1 || count == 3 {
+            // player 1/2 effect file
             get_script_file(*last_script, ScriptType::Effect)
-        } else if count == 4 { // cmn
+        } else if count == 4 {
+            // cmn
             get_script_file(ScriptFile::Common, ScriptType::Main)
-        } else { // cmn effect
+        } else {
+            // cmn effect
             get_script_file(ScriptFile::Common, ScriptType::Effect)
         };
 
@@ -121,7 +133,7 @@ fn load_script_hook(this: *mut u8, script_ptr: *mut u8, script_size: u32) {
             3 => script_storage.player_2_ef = script,
             4 => script_storage.common = script,
             5 => script_storage.common_ef = script,
-            _ => {},
+            _ => {}
         }
 
         let mods_enabled = global::MODS_ENABLED.load(Ordering::SeqCst);
@@ -131,7 +143,7 @@ fn load_script_hook(this: *mut u8, script_ptr: *mut u8, script_size: u32) {
                 return LoadBBScriptHook.call(this, mod_pointer, mod_size);
             }
         }
-        
+
         LoadBBScriptHook.call(this, script_ptr, script_size)
     }
 }
@@ -151,32 +163,32 @@ impl BBScriptStorage {
         match index {
             0 => {
                 if let Some(script) = self.player_1.as_mut() {
-                    return Some((script.as_mut_ptr(), script.len() as u32))
+                    return Some((script.as_mut_ptr(), script.len() as u32));
                 }
             }
             1 => {
                 if let Some(script) = self.player_1_ef.as_mut() {
-                    return Some((script.as_mut_ptr(), script.len() as u32))
+                    return Some((script.as_mut_ptr(), script.len() as u32));
                 }
             }
             2 => {
                 if let Some(script) = self.player_2.as_mut() {
-                    return Some((script.as_mut_ptr(), script.len() as u32))
+                    return Some((script.as_mut_ptr(), script.len() as u32));
                 }
             }
             3 => {
                 if let Some(script) = self.player_2_ef.as_mut() {
-                    return Some((script.as_mut_ptr(), script.len() as u32))
+                    return Some((script.as_mut_ptr(), script.len() as u32));
                 }
             }
             4 => {
                 if let Some(script) = self.common.as_mut() {
-                    return Some((script.as_mut_ptr(), script.len() as u32))
+                    return Some((script.as_mut_ptr(), script.len() as u32));
                 }
             }
             5 => {
                 if let Some(script) = self.common_ef.as_mut() {
-                    return Some((script.as_mut_ptr(), script.len() as u32))
+                    return Some((script.as_mut_ptr(), script.len() as u32));
                 }
             }
             _ => {}

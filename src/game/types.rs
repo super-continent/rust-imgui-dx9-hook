@@ -1,4 +1,4 @@
-pub type FnLoadBBScript = unsafe extern "thiscall" fn (*mut u8, *mut u8, u32);
+pub type FnLoadBBScript = unsafe extern "thiscall" fn(*mut u8, *mut u8, u32);
 
 pub struct Player {
     health: u32,
