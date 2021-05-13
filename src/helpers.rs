@@ -1,11 +1,20 @@
+use std::ffi::OsStr;
 use std::mem;
-use winapi::ctypes::c_int;
+use std::os::windows::ffi::OsStrExt;
 
+use winapi::ctypes::c_int;
 use winapi::shared::{minwindef::*, windef::HWND};
 use winapi::um::winuser::{
     CallWindowProcA, CallWindowProcW, GetWindowLongPtrA, GetWindowLongPtrW, IsWindowUnicode,
     SetWindowLongPtrA, SetWindowLongPtrW, GWLP_WNDPROC, WNDPROC,
 };
+
+#[macro_export]
+macro_rules! make_fn {
+    ($address:expr => $fn_type:ty) => {
+        std::mem::transmute::<*const usize, $fn_type>($address as *const usize)
+    };
+}
 
 pub unsafe fn set_window_long_ptr(hwnd: HWND, index: c_int, new_long: i32) -> i32 {
     match IsWindowUnicode(hwnd) {
@@ -41,4 +50,12 @@ pub unsafe fn call_wndproc(
         0 => CallWindowProcA(prev_wnd_func, hwnd, msg, wparam, lparam),
         _ => CallWindowProcW(prev_wnd_func, hwnd, msg, wparam, lparam),
     }
+}
+
+pub fn win32_wstring(val: &str) -> Vec<u16> {
+    // Encode string wide and then add null at the end, collect to Vec<u16>
+    OsStr::new(val)
+        .encode_wide()
+        .chain(std::iter::once(0))
+        .collect::<Vec<u16>>()
 }
