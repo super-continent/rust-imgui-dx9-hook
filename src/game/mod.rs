@@ -1,5 +1,5 @@
 pub mod hooks;
-mod offset;
+pub mod offset;
 pub mod types;
 
 use std::io::prelude::*;

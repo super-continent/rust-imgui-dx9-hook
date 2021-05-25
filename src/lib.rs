@@ -4,6 +4,7 @@ mod game;
 mod global;
 mod helpers;
 mod ui;
+mod error;
 
 use std::ffi::{CString, OsString};
 use std::fs;
@@ -25,7 +26,7 @@ use winapi::{
     shared::ntdef::HRESULT,
     shared::winerror,
     um::libloaderapi,
-    um::sysinfoapi::GetSystemDirectoryW,
+    um::{consoleapi::AllocConsole, sysinfoapi::GetSystemDirectoryW},
     um::{unknwnbase::LPUNKNOWN, winnt::DLL_PROCESS_ATTACH},
 };
 
@@ -49,32 +50,36 @@ pub extern "stdcall" fn DllMain(hinst_dll: HINSTANCE, attach_reason: DWORD, _: c
 }
 
 unsafe fn initialize() {
-    WriteLogger::init(
-        LOG_LEVEL,
-        Config::default(),
-        std::fs::File::create("rev2mod.log").unwrap(),
-    )
-    .unwrap();
+    if let Ok(logfile) = std::fs::File::create("rev2mod.log") {
+        WriteLogger::init(LOG_LEVEL, Config::default(), logfile).unwrap();
+    } else {
+        AllocConsole();
+        TermLogger::init(LOG_LEVEL, Config::default(), TerminalMode::Stdout).unwrap();
+    }
 
+    
     info!("Initializing!");
-
+    
     info!(
         "Mods folder created: {}",
         fs::create_dir(global::MODS_FOLDER).is_ok()
     );
 
     let base_addr = libloaderapi::GetModuleHandleA(ptr::null_mut());
-
+    
     global::BASE_ADDRESS.store(base_addr as u32, Ordering::SeqCst);
-
+    
     let mut ui_result = ui::ui_hooks::init_ui();
     while let Err(e) = ui_result {
         error!("Initializing UI failed: {}", e);
-        thread::sleep(std::time::Duration::from_secs(1));
+        thread::sleep(std::time::Duration::from_secs(5));
         ui_result = ui::ui_hooks::init_ui();
     }
     info!("UI hook success!");
-
+    
+    debug!("Waiting 5 seconds before initializing game hooks...");
+    thread::sleep(std::time::Duration::from_secs(5));
+    
     let game_result = game::hooks::init_game_hooks();
 
     info!("Game hooks ok?: {}", game_result.is_ok());

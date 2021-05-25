@@ -4,9 +4,10 @@ use std::os::windows::ffi::OsStrExt;
 
 use winapi::ctypes::c_int;
 use winapi::shared::{minwindef::*, windef::HWND};
+use winapi::um::winnt::LONG;
 use winapi::um::winuser::{
-    CallWindowProcA, CallWindowProcW, GetWindowLongPtrA, GetWindowLongPtrW, IsWindowUnicode,
-    SetWindowLongPtrA, SetWindowLongPtrW, GWLP_WNDPROC, WNDPROC,
+    CallWindowProcA, CallWindowProcW, GetWindowLongA, GetWindowLongPtrA, GetWindowLongPtrW,
+    GetWindowLongW, IsWindowUnicode, SetWindowLongPtrA, SetWindowLongPtrW, GWLP_WNDPROC, WNDPROC,
 };
 
 #[macro_export]
@@ -37,6 +38,13 @@ pub unsafe fn get_wndproc(hwnd: HWND) -> WNDPROC {
     } else {
         return None;
     }
+}
+
+pub unsafe fn get_window_long(hwnd: HWND, n_index: INT) -> LONG {
+    return match IsWindowUnicode(hwnd) {
+        0 => GetWindowLongA(hwnd, n_index),
+        _ => GetWindowLongW(hwnd, n_index),
+    };
 }
 
 pub unsafe fn call_wndproc(

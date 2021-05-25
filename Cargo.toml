@@ -1,5 +1,5 @@
 [package]
-name = "rev2hook"
+name = "rev2-mod"
 version = "0.1.0"
 authors = [""]
 edition = "2018"
@@ -16,14 +16,13 @@ save-state = []
 # default = ["save-state"]
 
 [dependencies]
-d3d9_device_grabber = { git = "https://github.com/super-continent/d3d9-device-grabber" }
-imgui-impl-win32-rs = { git = "https://github.com/super-continent/imgui-impl-win32-rs" }
-imgui-dx9-renderer = "0.5"
-winapi = { version = "0.3", features = ["minwindef", "consoleapi", "libloaderapi", "d3d9", "d3d9types", "ntdef"] }
-imgui = "0.5"
-detour = "0.8"
-lazy_static = "1.4"
-parking_lot = "0.11"
+imgui-impl-win32-rs = { path = "./imgui-impl-win32-rs" }
+imgui-dx9-renderer = "0"
+winapi = { version = "0", features = ["minwindef", "consoleapi", "libloaderapi", "d3d9", "d3d9types", "ntdef"] }
+imgui = "0"
+detour = { git = "https://github.com/darfink/detour-rs"}
+lazy_static = "1"
+parking_lot = "0"
 log = "0.4"
 simplelog = "0.8"
-crossbeam = "0.8.0"
+thiserror = "1.0"

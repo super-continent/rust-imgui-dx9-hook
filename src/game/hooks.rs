@@ -62,7 +62,7 @@ fn load_script_hook(this: *mut u8, script_ptr: *mut u8, script_size: u32) {
     // TODO: figure out how to detect which character and script
     // is being loaded in a non-hacky way, should be a UE3 script function
 
-    trace!(
+    debug!(
         "this: {:#X}, script_ptr: {:#X}, script_size: {:#X}",
         this as usize,
         script_ptr as usize,
